@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <h1>Todo List</h1>
+    <br>
+    <form>
+        <div class="main">
+            <input type="text" id="inputValue" placeholder="Type" />
+            <button class="btn">Add Todo</button>
+            
+        </div>
+        <section class="todo-lists-elem"></section>
+    </form>
+    <script>
+
+        const mainTodoElem = document.querySelector(".todo-lists-elem"); // to get the all class 
+        const inputValue = document.getElementById("inputValue"); // to get id 
+
+
+
+        const getTodoListFromLocal = () => {
+           return JSON.parse(localStorage.getItem("youtubeTodoList")); // to get the item and to convert the string to array
+        };
+
+
+        // to remove the data 
+        const addTodoListLocalStorage = (localTodoLists) => {
+            return localStorage.setItem(
+                "youtubeTodoList",
+            JSON.stringify(localTodoLists));
+        };
+
+
+        let  localTodoLists = getTodoListFromLocal() || [];  // if elements are there to show otherwise to show the empty array
+
+
+
+
+        // to add list dynamically and to show the list of elements in the on screen
+        const addTodoDynamicElement = (curElem) => {
+            const divElement = document.createElement("div"); // to create the div 
+            divElement.classList.add("main_todo_div"); // to create the class inside the div
+            divElement.innerHTML = `<li>${curElem}</li><button class="deleteBtn">Delete</button>`; // to create the list and button 
+            mainTodoElem.append(divElement);
+        };
+
+
+
+
+        // to store the Element into the local storage 
+        const addTodoList = (e) => {
+            e.preventDefault();
+            const todoListValue = inputValue.value.trim(); //to input values are add the without white space 
+
+            inputValue.value = "";
+
+
+            if (todoListValue !== "" &&!(localTodoLists.includes(todoListValue))){ // to check if repeated elements are there or not 
+                localTodoLists.push(todoListValue); // to add the element into the array
+                localTodoLists = [... new Set(localTodoLists)];  // to create a set inside the array and also to write without repeating elements
+                console.log(localTodoLists);
+                localStorage.setItem("youtubeTodoList",JSON.stringify(localTodoLists)); // to convert the string 
+                
+
+                addTodoDynamicElement(todoListValue);
+            }
+        };
+
+
+
+        // to create the new dynamically function with the help of forEach loop 
+        const showTodoList = () => {
+            console.log(localTodoLists);
+            
+            localTodoLists.forEach((curElem) => {
+                addTodoDynamicElement(curElem);
+            });
+        };
+
+        showTodoList();
+
+        // remove the data
+        const removeTodoElem = (e) => {
+            const todoToRemove = e.target;
+            let todoListContent = todoToRemove.previousElementSibling.innerText;
+            let parentElem = todoToRemove.parentElement;
+            console.log(todoListContent);
+
+            localTodoLists = localTodoLists.filter((curTodo) => {
+                return curTodo !== todoListContent.toLowerCase();
+            });
+
+            addTodoListLocalStorage(localTodoLists);
+            parentElem.remove();
+
+            console.log(localTodoLists);
+        };
+       
+        
+        
+        // to create the function to delete the elements when ever you click the delete button 
+        mainTodoElem.addEventListener("click",(e) => {
+            e.preventDefault();
+            console.log(e.target);
+            if(e.target.classList.contains("deleteBtn")){
+                removeTodoElem(e);
+            }
+        });
+
+
+        document.querySelector(".btn").addEventListener("click" ,(e) =>{
+            addTodoList(e);
+        });
+
+    </script>
+</body>
+</html>
